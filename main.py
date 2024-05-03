@@ -205,7 +205,7 @@ def adversarial_train(args):
     source, target = list(map(int, args.pair.split('-')))
     model = get_model(args.dataset, args.network).to(args.device)
     #model = torch.nn.DataParallel(model)
-    model = model.to(args.device)
+    #model = model.to(args.device)
 
     train_loader = get_loader(args.dataset, True,  args.batch_size)
     test_loader  = get_loader(args.dataset, False, args.batch_size)
