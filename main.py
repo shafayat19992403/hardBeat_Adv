@@ -203,10 +203,12 @@ def attack(args):
 def adversarial_train(args):
     print('is inside')
     source, target = list(map(int, args.pair.split('-')))
-    model = get_model(args.dataset, args.network).to(args.device)
+    #model = get_model(args.dataset, args.network).to(args.device)
     #model = torch.nn.DataParallel(model)
     #model = model.to(args.device)
+    device = args.device  # Get the device
 
+    model = get_model(args.dataset, args.network).to(device)  
     train_loader = get_loader(args.dataset, True,  args.batch_size)
     test_loader  = get_loader(args.dataset, False, args.batch_size)
 
