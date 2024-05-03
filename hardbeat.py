@@ -10,7 +10,6 @@ from util import decision_function
 
 def hardbeat(model, inputs, normalize, target, size=7, pos=(14, 14),
              query_limit=50000):
-    device = inputs.device
 
     input_size = inputs.shape[2]
     region = True if input_size > 32 else False
@@ -23,11 +22,6 @@ def hardbeat(model, inputs, normalize, target, size=7, pos=(14, 14),
     noise_shape = [100] + list(inputs[0].shape)
     if region:
         noise_shape[2:] = [32, 32]
-
-
-    init_mask = torch.zeros(inputs[0, 0].shape, device=device)
-    init_pattern = torch.zeros(noise_shape, device=device)
-    init_predict = torch.zeros(len(inputs), device=device)
 
     ### calculate # iterations for each stage ###
     stage1_total = int(qlimit * 0.1)
