@@ -327,8 +327,7 @@ if __name__ == '__main__':
     print(torch.cuda.device_count())
     #args.device = torch.device('cuda')
     # Dynamically setting device based on CUDA availability
-    #device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    device = torch.device("cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     args.device = device
 
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
