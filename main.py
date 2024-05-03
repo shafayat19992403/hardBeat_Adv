@@ -208,7 +208,7 @@ def adversarial_train(args):
     #model = model.to(args.device)
     device = args.device  # Get the device
 
-    model = get_model(args.dataset, args.network).to(device)  
+    model = get_model(args.dataset, args.network).to(device)  # Move model to GPU  
     train_loader = get_loader(args.dataset, True,  args.batch_size)
     test_loader  = get_loader(args.dataset, False, args.batch_size)
 
