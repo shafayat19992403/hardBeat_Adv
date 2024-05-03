@@ -200,15 +200,67 @@ def attack(args):
             log.write('\n')
         log.close()
 
+# def adversarial_train(args):
+#     print('is inside')
+#     source, target = list(map(int, args.pair.split('-')))
+#     #model = get_model(args.dataset, args.network).to(args.device)
+#     #model = torch.nn.DataParallel(model)
+#     #model = model.to(args.device)
+#     device = args.device  # Get the device
+
+#     model = get_model(args.dataset, args.network).to(device)  # Move model to GPU  
+#     train_loader = get_loader(args.dataset, True,  args.batch_size)
+#     test_loader  = get_loader(args.dataset, False, args.batch_size)
+
+#     criterion = torch.nn.CrossEntropyLoss()
+
+#     optimizer = torch.optim.SGD(model.parameters(), lr=1e-1, momentum=0.9, weight_decay=5e-4)
+#     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.1)
+
+#     save_path = f'ckpt/{args.dataset}_{args.network}_adv_trained.pt'
+
+#     best_acc = 0
+#     for epoch in range(args.epochs_adv):
+#         model.train()
+#         for step, (x_batch, y_batch) in enumerate(train_loader):
+#             x_batch, y_batch = x_batch.to(args.device), y_batch.to(args.device)
+
+#             # Generate adversarial examples (for a subset or all)
+#             #x_batch_adv, _, _ = hardbeat(model.module, x_batch, get_norm(args.dataset)[0], target=y_batch, size=args.patch_size, query_limit=args.query_limit)
+#             x_batch_adv, _, _ = hardbeat(model, x_batch, get_norm(args.dataset)[0], target, size=args.patch_size, query_limit=args.query_limit)
+#             optimizer.zero_grad()
+#             output_clean = model(x_batch)
+#             output_adv = model(x_batch_adv)
+
+#             loss_clean = criterion(output_clean, y_batch)
+#             loss_adv = criterion(output_adv, y_batch)
+#             loss = loss_clean + loss_adv  # Combine losses
+
+#             loss.backward()
+#             optimizer.step()
+
+#             #pred = output_clean.max(dim=1)[1]
+
+#             # if step % 10 == 0:
+#             print(f'Epoch {epoch}, Step {step}, Loss Clean: {loss_clean.item()}, Loss Adv: {loss_adv.item()}')
+
+#         scheduler.step()
+#         acc = eval_acc(model, test_loader, args.device)
+#         print(f'Epoch {epoch}, ACC: {acc:.4f}')
+
+#         if acc > best_acc:
+#             best_acc = acc
+#             print(f'--- BEST ACC: {best_acc:.4f} ---')
+#             torch.save(model.module.state_dict(), save_path)
+
+
 def adversarial_train(args):
     print('is inside')
     source, target = list(map(int, args.pair.split('-')))
-    #model = get_model(args.dataset, args.network).to(args.device)
-    #model = torch.nn.DataParallel(model)
-    #model = model.to(args.device)
     device = args.device  # Get the device
 
-    model = get_model(args.dataset, args.network).to(device)  # Move model to GPU  
+    model = get_model(args.dataset, args.network).to(device)  # Move model to GPU
+
     train_loader = get_loader(args.dataset, True,  args.batch_size)
     test_loader  = get_loader(args.dataset, False, args.batch_size)
 
@@ -223,11 +275,11 @@ def adversarial_train(args):
     for epoch in range(args.epochs_adv):
         model.train()
         for step, (x_batch, y_batch) in enumerate(train_loader):
-            x_batch, y_batch = x_batch.to(args.device), y_batch.to(args.device)
+            x_batch, y_batch = x_batch.to(device), y_batch.to(device)  # Move input data to GPU
 
             # Generate adversarial examples (for a subset or all)
-            #x_batch_adv, _, _ = hardbeat(model.module, x_batch, get_norm(args.dataset)[0], target=y_batch, size=args.patch_size, query_limit=args.query_limit)
             x_batch_adv, _, _ = hardbeat(model, x_batch, get_norm(args.dataset)[0], target, size=args.patch_size, query_limit=args.query_limit)
+            x_batch_adv = x_batch_adv.to(device)  # Move adversarial examples to GPU
             optimizer.zero_grad()
             output_clean = model(x_batch)
             output_adv = model(x_batch_adv)
@@ -245,13 +297,15 @@ def adversarial_train(args):
             print(f'Epoch {epoch}, Step {step}, Loss Clean: {loss_clean.item()}, Loss Adv: {loss_adv.item()}')
 
         scheduler.step()
-        acc = eval_acc(model, test_loader, args.device)
+        acc = eval_acc(model, test_loader, device)  # Pass device to eval_acc function
         print(f'Epoch {epoch}, ACC: {acc:.4f}')
 
         if acc > best_acc:
             best_acc = acc
             print(f'--- BEST ACC: {best_acc:.4f} ---')
-            torch.save(model.module.state_dict(), save_path)
+            torch.save(model.state_dict(), save_path)  # No need to access module attribute
+
+
 
 def evaluate_on_adversarial_test_set(model, test_loader, args):
     print('Evaluating on adversarial examples...')
