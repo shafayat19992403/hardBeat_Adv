@@ -23,6 +23,9 @@ def hardbeat(model, inputs, normalize, target, size=7, pos=(14, 14),
     if region:
         noise_shape[2:] = [32, 32]
 
+    init_mask = torch.zeros(inputs[0, 0].shape, device=torch.device("cuda"))
+    noise = torch.rand(noise_shape, device=torch.device("cuda"))
+
     ### calculate # iterations for each stage ###
     stage1_total = int(qlimit * 0.1)
     stage1_iter  = int(stage1_total / 2)
@@ -96,6 +99,8 @@ def hardbeat(model, inputs, normalize, target, size=7, pos=(14, 14),
         favg = 0
         preds = []
         for j in range(len(inputs)):
+            mask = init_mask.to(inputs[j].device)
+            noise = noise.to(inputs[j].device)
             perturbed = (1 - mask) * inputs[j] + mask * noise
             #perturbed = (1 - mask.to(inputs[j].device)) * inputs[j] + mask.to(inputs[j].device) * noise.to(inputs[j].device)
 
