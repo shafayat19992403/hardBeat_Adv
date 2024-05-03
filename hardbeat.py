@@ -99,8 +99,8 @@ def hardbeat(model, inputs, normalize, target, size=7, pos=(14, 14),
         favg = 0
         preds = []
         for j in range(len(inputs)):
-            mask = init_mask.to(inputs[j].device)
-            noise = noise.to(inputs[j].device)
+            # mask = init_mask.to(inputs[j].device)
+            # noise = noise.to(inputs[j].device)
             perturbed = (1 - mask) * inputs[j] + mask * noise
             #perturbed = (1 - mask.to(inputs[j].device)) * inputs[j] + mask.to(inputs[j].device) * noise.to(inputs[j].device)
 
