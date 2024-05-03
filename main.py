@@ -322,10 +322,10 @@ if __name__ == '__main__':
     parser.add_argument('--epochs_adv', default=5, type=int, help='number of epochs for adversarial training')
 
     args = parser.parse_args()
-    #args.device = torch.device('cuda')
+    args.device = torch.device('cuda')
     # Dynamically setting device based on CUDA availability
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    args.device = device
+    # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # args.device = device
 
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
